@@ -1,5 +1,4 @@
 use bs_num::{max, min, Numeric, Zero};
-///inspired by rstar crate
 use std::fmt::Debug;
 
 pub trait Coordinate: Copy + Clone + PartialEq + Debug {
