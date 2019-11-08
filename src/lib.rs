@@ -2,7 +2,7 @@ use bs_num::{max, min, Numeric, Zero};
 use std::fmt::Debug;
 use std::ops::Index;
 
-pub trait Coordinate: Copy + Clone + PartialEq + Debug + Index<usize> {
+pub trait Coordinate: Copy + Clone + PartialEq + Debug {
     ///numeric type
     type Scalar: Numeric;
 
@@ -138,17 +138,6 @@ mod tests {
         }
     }
 
-    impl<T> Index<usize> for Pt<T>
-        where T: Numeric {
-        type Output = T;
-        fn index(&self, i: usize) -> &Self::Output {
-            match i {
-                0 => &self.x,
-                1 => &self.y,
-                _ => unreachable!(),
-            }
-        }
-    }
 
     fn even(x: i32) -> bool {
         x % 2 == 0
