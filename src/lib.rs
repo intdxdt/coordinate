@@ -97,7 +97,6 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fmt::Pointer;
 
     #[derive(Copy, Clone, PartialOrd, PartialEq, Debug)]
     struct Pt<T>
