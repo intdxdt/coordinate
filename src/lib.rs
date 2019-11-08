@@ -1,6 +1,5 @@
 use bs_num::{max, min, Numeric, Zero};
 use std::fmt::Debug;
-use std::ops::Index;
 
 pub trait Coordinate: Copy + Clone + PartialEq + Debug {
     ///numeric type
