@@ -1,7 +1,8 @@
 use bs_num::{max, min, Numeric, Zero};
 use std::fmt::Debug;
+use std::ops::Index;
 
-pub trait Coordinate: Copy + Clone + PartialEq + Debug {
+pub trait Coordinate: Copy + Clone + PartialEq + Debug + Index<usize> {
     ///numeric type
     type Scalar: Numeric;
 
@@ -97,6 +98,7 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fmt::Pointer;
 
     #[derive(Copy, Clone, PartialOrd, PartialEq, Debug)]
     struct Pt<T>
@@ -108,9 +110,7 @@ mod tests {
     }
 
     impl<T> Coordinate for Pt<T>
-        where
-            T: Numeric,
-    {
+        where T: Numeric {
         type Scalar = T;
         const DIM: usize = 2;
 
@@ -133,6 +133,18 @@ mod tests {
             match i {
                 0 => &mut self.x,
                 1 => &mut self.y,
+                _ => unreachable!(),
+            }
+        }
+    }
+
+    impl<T> Index<usize> for Pt<T>
+        where T: Numeric {
+        type Output = T;
+        fn index(&self, i: usize) -> &Self::Output {
+            match i {
+                0 => &self.x,
+                1 => &self.y,
                 _ => unreachable!(),
             }
         }
@@ -172,7 +184,7 @@ mod tests {
 
         let a = Pt { x: 2, y: 2 };
         let b = Pt { x: 8, y: 10 };
-        assert!(a.all_comp( &b, both_even));
+        assert!(a.all_comp(&b, both_even));
         let c = a.add(&b);
         assert_eq!(c, Pt { x: 10, y: 12 });
     }
