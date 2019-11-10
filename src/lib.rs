@@ -18,14 +18,17 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
     ///mutable value in ith dim
     fn nth_mut(&mut self, i: usize) -> &mut Self::Scalar;
 
+    ///new from origin (::zero, ::zero)
     fn new_origin() -> Self {
         Self::new_from_value(Zero::zero())
     }
 
+    ///new from a given value (val, val)
     fn new_from_value(v: Self::Scalar) -> Self {
         Self::gen(|_| v)
     }
 
+    ///performs component-wise operation
     fn component_wise(
         &self,
         other: &Self,
@@ -34,6 +37,7 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
         Self::gen(|i| func(self.nth(i), other.nth(i)))
     }
 
+    ///checks if all componets satisfies a predicate
     fn all_comp(&self, other: &Self, func: impl Fn(Self::Scalar, Self::Scalar) -> bool) -> bool {
         let mut bln = true;
         let mut i: usize = 0;
@@ -44,34 +48,42 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
         bln
     }
 
+    ///minimum of bounding box - self & other
     fn min_of_bounds(&self, other: &Self) -> Self {
         self.component_wise(other, min)
     }
 
+    ///maximum of bounding box - self & other
     fn max_of_bounds(&self, other: &Self) -> Self {
         self.component_wise(other, max)
     }
 
+    /// addition
     fn add(&self, other: &Self) -> Self {
         self.component_wise(other, |l, r| l + r)
     }
 
+    ///components from self & other
     fn comp(&self, other: &Self) -> Self {
         self.sub(other)
     }
 
+    ///subtraction
     fn sub(&self, other: &Self) -> Self {
         self.component_wise(other, |l, r| l - r)
     }
 
+    ///multiplication
     fn mult(&self, k: Self::Scalar) -> Self {
         self.map(|v| k * v)
     }
 
+    ///map given functor
     fn map(&self, transform: impl Fn(Self::Scalar) -> Self::Scalar) -> Self {
         Self::gen(|i| transform(self.nth(i)))
     }
 
+    ///fold component values given functor
     fn fold(
         &self,
         start_val: Self::Scalar,
@@ -83,11 +95,12 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
         }
         total
     }
-
+    ///sum of squares of all components
     fn square_length(&self) -> Self::Scalar {
         self.fold(Zero::zero(), |acc, v| acc + (v * v))
     }
 
+    ///square length between self & other
     fn square_distance(&self, other: &Self) -> Self::Scalar {
         self.comp(other).square_length()
     }
