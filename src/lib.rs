@@ -9,14 +9,14 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
     const DIM: usize;
 
     /// creates coordinate with values from each dimension
-    /// dim_val(i) -> returns coordinate value in ith dimension
-    fn gen(dim_val: impl Fn(usize) -> Self::Scalar) -> Self;
+    /// val_fn(i) -> returns coordinate value in ith dimension
+    fn gen(val_fn: impl Fn(usize) -> Self::Scalar) -> Self;
 
     ///value in ith dim
-    fn nth(&self, i: usize) -> Self::Scalar;
+    fn val(&self, i: usize) -> Self::Scalar;
 
     ///mutable value in ith dim
-    fn nth_mut(&mut self, i: usize) -> &mut Self::Scalar;
+    fn val_mut(&mut self, i: usize) -> &mut Self::Scalar;
 
     ///new from origin (::zero, ::zero)
     fn new_origin() -> Self {
@@ -34,7 +34,7 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
         other: &Self,
         func: impl Fn(Self::Scalar, Self::Scalar) -> Self::Scalar,
     ) -> Self {
-        Self::gen(|i| func(self.nth(i), other.nth(i)))
+        Self::gen(|i| func(self.val(i), other.val(i)))
     }
 
     ///checks if all componets satisfies a predicate
@@ -42,7 +42,7 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
         let mut bln = true;
         let mut i: usize = 0;
         while bln && i < Self::DIM {
-            bln = func(self.nth(i), other.nth(i));
+            bln = func(self.val(i), other.val(i));
             i += 1;
         }
         bln
@@ -80,7 +80,7 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
 
     ///map given functor
     fn map(&self, transform: impl Fn(Self::Scalar) -> Self::Scalar) -> Self {
-        Self::gen(|i| transform(self.nth(i)))
+        Self::gen(|i| transform(self.val(i)))
     }
 
     ///fold component values given functor
@@ -91,7 +91,7 @@ pub trait Coordinate: Copy + Clone + PartialEq + Debug {
     ) -> Self::Scalar {
         let mut total = start_val;
         for i in 0..Self::DIM {
-            total = func(total, self.nth(i))
+            total = func(total, self.val(i))
         }
         total
     }
@@ -132,7 +132,7 @@ mod tests {
             }
         }
 
-        fn nth(&self, i: usize) -> Self::Scalar {
+        fn val(&self, i: usize) -> Self::Scalar {
             match i {
                 0 => self.x,
                 1 => self.y,
@@ -140,7 +140,7 @@ mod tests {
             }
         }
 
-        fn nth_mut(&mut self, i: usize) -> &mut Self::Scalar {
+        fn val_mut(&mut self, i: usize) -> &mut Self::Scalar {
             match i {
                 0 => &mut self.x,
                 1 => &mut self.y,
@@ -162,8 +162,8 @@ mod tests {
     #[test]
     fn test_pt_using_coordinates() {
         let mut pt = Pt::new_origin();
-        *pt.nth_mut(0) = 3.;
-        *pt.nth_mut(1) = 4.;
+        *pt.val_mut(0) = 3.;
+        *pt.val_mut(1) = 4.;
 
         println!("{:?}", pt);
         let a = Pt { x: 1.0, y: 1.0 };
